@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NLMC — Message Receiver</title>
+<link rel="manifest" href="pwa-manifest.json">
+<meta name="theme-color" content="#0f172a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="pwa-style.css">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="app-icon">💌</div>
+    <div>
+      <div class="app-name">NLMC Receiver</div>
+      <div class="app-sub">Portfolio Message Manager</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span class="badge" id="newBadge">0 New</span>
+    <button id="installBtn">⬇️ Install App</button>
+  </div>
+</header>
+
+<main>
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-num" id="totalCount">0</div>
+      <div class="stat-label">Total Messages</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="repliedCount">0</div>
+      <div class="stat-label">Replied</div>
+    </div>
+  </div>
+
+  <div class="section-title">📬 Inbox</div>
+  <div class="msg-list" id="msgList">
+    <div class="empty-state">
+      <span class="emoji">📭</span>
+      <p>No messages yet.<br>Waiting for visitors to reach out...</p>
+    </div>
+  </div>
+</main>
+
+<!-- REPLY MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title">Reply to Message</div>
+    <div class="modal-to" id="modalTo"></div>
+    <textarea id="replyText" placeholder="Write your reply..."></textarea>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-send" onclick="submitReply()">Send Reply 📤</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATION -->
+<div class="notif" id="notif"></div>
+
+<script src="pwa-script.js"></script>
+</body>
+</html>
