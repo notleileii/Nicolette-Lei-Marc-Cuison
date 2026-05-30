@@ -1,4 +1,3 @@
-// ===== FIREBASE CONFIG =====
 const firebaseConfig = {
   apiKey: "AIzaSyBkoIW15zSc2tkq_gk_2VhLIambL_utaUc",
   authDomain: "poftolio-message.firebaseapp.com",
@@ -18,7 +17,6 @@ try {
   console.warn("Firebase not configured. Running in demo mode.");
 }
 
-// ===== AGE CALCULATOR =====
 function calcAge() {
   const bday = new Date("2005-05-09");
   const today = new Date();
@@ -27,52 +25,47 @@ function calcAge() {
   if (m < 0 || (m === 0 && today.getDate() < bday.getDate())) age--;
   return age;
 }
-document.getElementById("ageBadge").textContent = "Age: " + calcAge() + " years old";
-document.getElementById("footerYear").textContent = new Date().getFullYear();
+document.getElementById("ageTag").textContent = "Age: " + calcAge() + " years old";
+document.getElementById("yr-tag").textContent = new Date().getFullYear();
 
-// ===== LOADER =====
 window.addEventListener("load", () => {
   setTimeout(() => {
-    const loader = document.getElementById("loader");
-    loader.classList.add("fade-out");
-    setTimeout(() => (loader.style.display = "none"), 600);
+    const screen = document.getElementById("pf-screen");
+    screen.classList.add("dim-out");
+    setTimeout(() => (screen.style.display = "none"), 600);
   }, 1200);
 });
 
-// ===== THEME TOGGLE =====
 let isDark = true;
 
 function toggleTheme() {
   isDark = !isDark;
-  document.getElementById("body").className = isDark ? "dark" : "light";
-  document.getElementById("theme-icon").textContent = isDark ? "☀️" : "🌙";
-  document.getElementById("theme-label").textContent = isDark ? "Light" : "Dark";
+  document.getElementById("page-root").className = isDark ? "dark" : "light";
+  document.getElementById("palette-ico").textContent = isDark ? "☀️" : "🌙";
+  document.getElementById("palette-txt").textContent = isDark ? "Light" : "Dark";
 }
 
-// ===== MOBILE MENU =====
 function toggleMenu() {
-  document.getElementById("mobileMenu").classList.toggle("open");
+  document.getElementById("navDrawer").classList.toggle("expanded");
 }
 
 function closeMenu() {
-  document.getElementById("mobileMenu").classList.remove("open");
+  document.getElementById("navDrawer").classList.remove("expanded");
 }
 
-// ===== SCROLL REVEAL =====
-const observer = new IntersectionObserver(
+const watcher = new IntersectionObserver(
   (entries) => {
     entries.forEach((e) => {
-      if (e.isIntersecting) e.target.classList.add("visible");
+      if (e.isIntersecting) e.target.classList.add("shown");
     });
   },
   { threshold: 0.15 }
 );
-document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+document.querySelectorAll(".appear").forEach((el) => watcher.observe(el));
 
-// ===== SLIDER =====
 let slides = [];
 let currentSlide = 0;
-let sliderTimer = null;
+let reelTimer = null;
 
 function escapeHtml(str) {
   const d = document.createElement("div");
@@ -81,19 +74,18 @@ function escapeHtml(str) {
 }
 
 function buildSlider(messages) {
-  const inner = document.getElementById("sliderInner");
-  const dots = document.getElementById("sliderDots");
-  inner.innerHTML = "";
+  const track = document.getElementById("reelTrack");
+  const dots = document.getElementById("reelDots");
+  track.innerHTML = "";
   dots.innerHTML = "";
 
-  // Only show messages that have at least one reply
   const replied = (messages || []).filter(
     (m) => m.replies && Object.keys(m.replies).length > 0
   );
 
   if (replied.length === 0) {
-    inner.innerHTML =
-      '<div class="slide"><div style="text-align:center;width:100%;color:var(--text2);">No replies yet. Check back soon!</div></div>';
+    track.innerHTML =
+      '<div class="reel-item"><div style="text-align:center;width:100%;color:var(--text2);">No replies yet. Check back soon!</div></div>';
     return;
   }
 
@@ -104,46 +96,45 @@ function buildSlider(messages) {
     const latestReply = replyList[replyList.length - 1];
 
     const div = document.createElement("div");
-    div.className = "slide";
+    div.className = "reel-item";
     div.innerHTML = `
-      <div class="slide-content" style="width:100%;">
-        <p class="slide-replied-label">
+      <div class="reel-body">
+        <p class="reel-from">
           Nicolette replied to
           <strong style="color:var(--accent);">${escapeHtml(msg.name)}</strong>:
           <em style="color:var(--text2);font-style:italic;">${escapeHtml(msg.text)}</em>
         </p>
-        <p class="slide-reply-text">${escapeHtml(latestReply.text)}</p>
-        <span class="slide-meta">— NCuison &nbsp;·&nbsp; ${latestReply.time || ""}</span>
+        <p class="reel-msg">${escapeHtml(latestReply.text)}</p>
+        <span class="reel-sig">— NCuison &nbsp;·&nbsp; ${latestReply.time || ""}</span>
       </div>`;
-    inner.appendChild(div);
+    track.appendChild(div);
 
     const dot = document.createElement("div");
-    dot.className = "dot" + (i === 0 ? " active" : "");
+    dot.className = "reel-dot" + (i === 0 ? " on" : "");
     dot.onclick = () => goToSlide(i);
     dots.appendChild(dot);
   });
 
   currentSlide = 0;
   goToSlide(0);
-  startSlider();
+  startReel();
 }
 
 function goToSlide(n) {
   currentSlide = n;
-  document.getElementById("sliderInner").style.transform = `translateX(-${n * 100}%)`;
-  document.querySelectorAll(".dot").forEach((d, i) => d.classList.toggle("active", i === n));
+  document.getElementById("reelTrack").style.transform = `translateX(-${n * 100}%)`;
+  document.querySelectorAll(".reel-dot").forEach((d, i) => d.classList.toggle("on", i === n));
 }
 
-function startSlider() {
-  if (sliderTimer) clearInterval(sliderTimer);
+function startReel() {
+  if (reelTimer) clearInterval(reelTimer);
   if (slides.length < 2) return;
-  sliderTimer = setInterval(() => {
+  reelTimer = setInterval(() => {
     currentSlide = (currentSlide + 1) % slides.length;
     goToSlide(currentSlide);
   }, 5000);
 }
 
-// ===== FIREBASE MESSAGES LISTENER =====
 let demoMessages = [];
 
 if (db) {
@@ -156,14 +147,13 @@ if (db) {
   buildSlider([]);
 }
 
-// ===== SEND MESSAGE =====
 async function sendMessage() {
-  const name = document.getElementById("senderName").value.trim();
-  const text = document.getElementById("msgBody").value.trim();
-  const btn = document.getElementById("sendBtn");
+  const name = document.getElementById("fromName").value.trim();
+  const text = document.getElementById("msgText").value.trim();
+  const btn = document.getElementById("submitBtn");
 
-  if (!name) { showFormMsg("Please enter your name.", "error"); return; }
-  if (!text) { showFormMsg("Please write a message.", "error"); return; }
+  if (!name) { showFieldNote("Please enter your name.", "err"); return; }
+  if (!text) { showFieldNote("Please write a message.", "err"); return; }
 
   btn.disabled = true;
   btn.textContent = "Sending...";
@@ -182,51 +172,49 @@ async function sendMessage() {
   if (db) {
     try {
       await db.ref("messages").push(msgObj);
-      document.getElementById("senderName").value = "";
-      document.getElementById("msgBody").value = "";
-      showFormMsg("Message sent! 🎉", "success");
+      document.getElementById("fromName").value = "";
+      document.getElementById("msgText").value = "";
+      showFieldNote("Message sent! 🎉", "ok");
     } catch (e) {
-      showFormMsg("Error: " + e.message, "error");
+      showFieldNote("Error: " + e.message, "err");
     }
   } else {
-    // Demo mode — show in slider without persistence
     demoMessages.unshift(msgObj);
     buildSlider(demoMessages.slice(0, 20));
-    document.getElementById("senderName").value = "";
-    document.getElementById("msgBody").value = "";
-    showFormMsg("Sent in demo mode! Set up Firebase to persist messages. 🎉", "success");
+    document.getElementById("fromName").value = "";
+    document.getElementById("msgText").value = "";
+    showFieldNote("Sent in demo mode! Set up Firebase to persist messages. 🎉", "ok");
   }
 
   btn.disabled = false;
   btn.textContent = "Send Message ✉️";
 }
 
-function showFormMsg(text, type) {
-  const el = document.getElementById("formMsg");
+function showFieldNote(text, type) {
+  const el = document.getElementById("fieldNote");
   el.textContent = text;
-  el.className = "form-msg " + type;
-  setTimeout(() => (el.className = "form-msg"), 5000);
+  el.className = "field-note " + type;
+  setTimeout(() => (el.className = "field-note"), 5000);
 }
 
-// ===== SMOOTH SCROLL WITH LOADING FLASH =====
 document.querySelectorAll('a[href^="#"]').forEach((a) => {
   a.addEventListener("click", function (e) {
     const target = document.querySelector(this.getAttribute("href"));
     if (!target) return;
     e.preventDefault();
 
-    const loader = document.getElementById("loader");
-    loader.style.display = "flex";
-    loader.style.opacity = "1";
-    loader.querySelector(".loader-text").textContent = "Navigating...";
+    const screen = document.getElementById("pf-screen");
+    screen.style.display = "flex";
+    screen.style.opacity = "1";
+    screen.querySelector(".pf-spin-label").textContent = "Navigating...";
 
     setTimeout(() => {
       target.scrollIntoView({ behavior: "smooth" });
-      loader.classList.add("fade-out");
+      screen.classList.add("dim-out");
       setTimeout(() => {
-        loader.style.display = "none";
-        loader.classList.remove("fade-out");
-        loader.querySelector(".loader-text").textContent = "Loading Portfolio...";
+        screen.style.display = "none";
+        screen.classList.remove("dim-out");
+        screen.querySelector(".pf-spin-label").textContent = "Loading Portfolio...";
       }, 500);
     }, 400);
   });
